@@ -7,16 +7,18 @@ import csv
 # Read the CSV File 
 dirname = os.path.dirname(__file__)
 print (dirname)
-csvpath = os.path.join(dirname, 'Resources', 'budget_data.csv')
-
+csvpath = os.path.join(dirname, 'Resources', 'election_data.csv')
 
 #Define Variables: 
-months = 0 # Count for total votes
-netpnl = 0 # Net profit or loss
-previous = 0 # Previous profit or loss
-netchange = 0 # Net change in profit or loss
-lastchange = 0 # Previous Net change in profit 
-lastchange1 = 0 # Previous Net change in loss
+count = 0 # Count for total votes
+candidate1 = "Unsure" # Idenitfier for First Candidate
+candidate2 = "Unsure" # Idenitfier for Second Candidate 
+candidate3 = "Unsure" # Idenitfier for Third Candidate
+candidate4 = "Unsure" # Idenitfier for Fourth Candidate
+count1 = 0 # Count for total votes for the First Candidate
+count2 = 0 # Count for total votes for the Second Candidate
+count3 = 0 # Count for total votes for the Third Candidate
+count4 = 0 # Count for total votes for the Fourth Candidate
 
 # We can manipulate each element as we go
 
@@ -30,57 +32,77 @@ with open(csvpath) as csvfile:
     csv_header = next(csvreader)
     print(f"CSV Header: {csv_header}")
 
-    # Read each row of data after the header
+    # Assign counts(votes) and Candidate names for a summary table of candidates - complete list of candidates who received votes
+
     for row in csvreader:
-        pnl = int(row[1]) #Set Profit and Loss column for Profit or Loss Amount
-        months = months + 1 #Count to calculate Total Months 
-        netpnl = netpnl + pnl #Net profit or loss variable - The net total amount of "Profit/Losses" over the entire period
-        previous = pnl - previous #Previous Profit or Loss value for comparison
-
-        if pnl == previous: 
-            change = 0 #Set 0 value for the first row as there is no change
-    
+        count = count + 1
+        candidate = str(row[2]) 
+        if candidate1 == "Unsure":
+            candidate1 = candidate
+            count1 = count1+ 1
+        elif candidate == candidate1:
+            count1 = count1+ 1
+        elif candidate2 == "Unsure":
+            candidate2 = candidate 
+            count2 = count2+1
+        elif candidate == candidate2:
+            count2 = count2+ 1    
+        elif candidate3 == "Unsure":
+            candidate3 = candidate 
+            count3 = count3+1
+        elif candidate == candidate3:
+            count3 = count3+ 1  
+        elif candidate4 == "Unsure":
+            candidate4 = candidate 
+            count4 = count4+1  
         else: 
-            change = pnl - (pnl - previous) 
-            netchange = (netchange + change)
-            if lastchange > change: 
-                maxchange = lastchange #The greatest increase in profits (date and amount) over the entire period
-                lastchange = maxchange
-            else: 
-                maxchange = change 
-                lastchange = maxchange #The greatest increase in profits (date and amount) over the entire period
-                maxdate = row[0] #The greatest increase in profits (date) over the entire period
+            count4 = count4 + 1
 
-            if lastchange1 < change: 
-                minchange = lastchange1
-                lastchange1 = minchange #The greatest decrease in losses (date and amount) over the entire period
-            else: 
-                minchange = change
-                lastchange1 = minchange #The greatest decrease in losses (date and amount) over the entire period
-                mindate = row[0] #The greatest decrease in losses (date) over the entire period
-        previous = pnl
+# Identify the Candidate with the highest votes - winner of the election based on popular vote
 
-avchange = format(netchange/(months-1),'.2f') # The average of the changes in "Profit/Losses" over the entire period
+if count1 > count2:
+    winner = candidate1
+elif count2 > count3:
+    winner = candidate2 
+elif count3 > count4:  
+    winnner = candidate3
+else:
+    winner = candidate4      
 
+# Calculate percentage of votes each candidate won
+
+cand1_perc = "{:.3%}".format(count1/count)    
+cand2_perc = "{:.3%}".format(count2/count)    
+cand3_perc = "{:.3%}".format(count3/count)    
+cand4_perc = "{:.3%}".format(count4/count)        
+      
 #Summary Table for Results on the Terminal       
-print("Financial Analysis")
+print("Election Results")
 print("--------------------------")
-print(f"Total Months : {months}")
-print(f"Total: ${netpnl}")
-print(f"Average Change: ${avchange}")
-print(f"Greatest Increase in Profits: {maxdate} (${maxchange})")
-print(f"Greatest Decrease in Profits: {mindate} (${minchange})")
+print(f"Total Votes : {count}")
+print("--------------------------")
+print(f"{candidate1}: {cand1_perc} ({count1})")
+print(f"{candidate2}: {cand2_perc} ({count2})")
+print(f"{candidate3}: {cand3_perc} ({count3})")
+print(f"{candidate4}: {cand4_perc} ({count4})")
+print("--------------------------")
+print(f"Winner: {winner}")
+print("--------------------------")
 
-#Specify the file to write to
-PyBank_Summary = os.path.join(dirname, 'analysis',"PyBank_Summary.txt")
+# Specify the file to write to
+Pypoll_summary = os.path.join(dirname, 'analysis','PyPoll_Summary.txt')
 
-# Write the txt file
-with open(PyBank_Summary, 'w') as txtfile:
-    txtfile.write("Financial Analysis\n")
-    txtfile.write("-------------------------\n")
-    txtfile.write(f"Total Months : {months}\n")
-    txtfile.write(f"Total: ${netpnl}\n")
-    txtfile.write(f"Average Change: ${avchange}\n")
-    txtfile.write(f"Greatest Increase in Profits: {maxdate} (${maxchange})\n")
-    txtfile.write(f"Greatest Decrease in Profits: {mindate} (${minchange})\n")
+# Write the Summary results to the txt file
+with open(Pypoll_summary, 'w') as txtfile:
+     txtfile.write("Election Results\n")
+     txtfile.write("-------------------------\n")
+     txtfile.write(f"Total Votes : {count}\n")
+     txtfile.write("-------------------------\n")
+     txtfile.write(f"{candidate1}: {cand1_perc} ({count1})\n")
+     txtfile.write(f"{candidate2}: {cand2_perc} ({count2})\n")
+     txtfile.write(f"{candidate3}: {cand3_perc} ({count3})\n")
+     txtfile.write(f"{candidate4}: {cand4_perc} ({count4})\n")
+     txtfile.write("-------------------------\n")
+     txtfile.write(f"Winner: {winner}\n")
+     txtfile.write("-------------------------\n")
 
